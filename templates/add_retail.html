@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Retail</title>
+    <link rel="stylesheet" href="./static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Tambah Retail</h2>
+
+        <!-- Form untuk Tambah Retail -->
+        <form id="formTambahRetail" method="POST" action="/add_retail">
+            <label for="nama_retail">Nama Retail:</label>
+            <input type="text" id="nama_retail" name="nama_retail" required>
+
+            <label for="contact">Contact:</label>
+            <input type="text" id="contact" name="contact" required>
+
+            <label for="alamat_retail">Alamat Retail:</label>
+            <textarea id="alamat_retail" name="alamat_retail" required></textarea>
+
+            <button type="submit" class="crud-btn">Simpan</button>
+        </form>
+    </div>
+</body>
+</html>

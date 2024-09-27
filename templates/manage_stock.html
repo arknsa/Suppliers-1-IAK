@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Stok</title>
+    <link rel="stylesheet" href="./static/styles.css">    
+</head>
+<body>
+    <div class="container">
+        <h2>Kelola Stok</h2>
+
+        <!-- Tombol Tambah Stok -->
+        <div class="add-button-container">
+            <a href="/add_stock" class="crud-btn">Tambah Stok</a>
+        </div>
+
+        <!-- Tabel Stok -->
+        <table id="kelolaStok">
+            <thead>
+                <tr>
+                    <th>ID Barang</th>
+                    <th>Nama Barang</th>
+                    <th>Jumlah Stok</th>
+                    <th>Stok Minimum</th>
+                    <th>Stok Maksimum</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in stock_list %}
+                <tr>
+                    <td>{{ product.id_barang }}</td>
+                    <td>{{ product.nama_product }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>{{ product.stok_minimum }}</td>
+                    <td>{{ product.stok_maksimum }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/edit_stock/{{ product.id }}" class="crud-btn">Edit</a>
+                            <form action="/delete_stock/{{ product.id }}" method="POST" style="display:inline;">
+                                <button type="submit" class="crud-btn">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

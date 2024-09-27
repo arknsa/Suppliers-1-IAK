@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Retail</title>
+    <link rel="stylesheet" href="./static/styles.css">    
+</head>
+<body>
+    <div class="container">
+        <h2>Kelola Retail</h2>
+
+        <!-- Tombol Tambah Retail -->
+        <div class="add-button-container">
+            <a href="/add_retail" class="crud-btn">Tambah Retail</a>
+        </div>
+
+        <!-- Tabel Retail -->
+        <table id="kelolaRetail">
+            <thead>
+                <tr>
+                    <th>ID Retail</th>
+                    <th>Nama Retail</th>
+                    <th>Contact</th>
+                    <th>Alamat Retail</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for retail in retail_list %}
+                <tr>
+                    <td>{{ retail.id_retail }}</td>
+                    <td>{{ retail.nama_retail }}</td>
+                    <td>{{ retail.contact }}</td>
+                    <td>{{ retail.alamat_retail }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/edit_retail/{{ retail.id_retail }}" class="crud-btn">Edit</a>
+                            <form action="/delete_retail/{{ retail.id_retail }}" method="POST" style="display:inline;">
+                                <button type="submit" class="crud-btn">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

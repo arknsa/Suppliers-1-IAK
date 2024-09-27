@@ -3,54 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management</title>
+    <title>Daftar Produk</title>
+    <link rel="stylesheet" href="./static/styles.css">
 </head>
 <body>
-    <h1>Product List</h1>
+    <div class="container">
+        <h2>Daftar Produk</h2>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nama Produk</th>
-                <th>Stock</th>
-                <th>Harga</th>
-                <th>Deskripsi</th>
-                <th>Gambar</th>
-                <th>Berat</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for product in products %}
-            <tr>
-                <td>{{ product[0] }}</td>
-                <td>{{ product[1] }}</td>
-                <td>{{ product[2] }}</td>
-                <td>{{ product[3] }}</td>
-                <td>{{ product[4] }}</td>
-                <td><img src="{{ product[5] }}" alt="{{ product[1] }}" width="100"></td>
-                <td>{{ product[6] }}</td>
-                <td>
-                    <form action="/delete_product/{{ product[0] }}" method="POST" style="display:inline;">
-                        <button type="submit">Delete</button>
-                    </form>
-                    <a href="/edit_product/{{ product[0] }}">Edit</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h2>Add New Product</h2>
-    <form action="/add_product" method="POST">
-        <input type="text" name="nama_product" placeholder="Nama Produk" required>
-        <input type="number" name="stock" placeholder="Stock" required>
-        <input type="text" name="harga" placeholder="Harga" required>
-        <textarea name="deskripsi" placeholder="Deskripsi"></textarea>
-        <input type="text" name="link_gambar_barang" placeholder="Link Gambar Barang" required>
-        <input type="text" name="berat" placeholder="Berat" required>
-        <button type="submit">Add Product</button>
-    </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Barang</th>
+                    <th>Nama Produk</th>
+                    <th>Kategori</th>
+                    <th>Stok</th>
+                    <th>Harga</th>
+                    <th>Berat</th>
+                    <th>Size</th>
+                    <th>Warna</th>
+                    <th>Deskripsi</th>
+                    <th>Gambar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.id_barang }}</td>
+                    <td>{{ product.nama_product }}</td>
+                    <td>{{ product.kategori }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>{{ product.harga }}</td>
+                    <td>{{ product.berat }}</td>
+                    <td>{{ product.size }}</td>
+                    <td>{{ product.warna }}</td>
+                    <td>{{ product.deskripsi }}</td>
+                    <td><img src="{{ product.link_gambar_barang }}" alt="{{ product.nama_product }}" width="50"></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

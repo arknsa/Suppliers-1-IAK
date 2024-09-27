@@ -1,41 +1,137 @@
-from . import db
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+from flask_login import UserMixin
+from flask_bcrypt import Bcrypt
 
-class Supplier(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    contact_info = db.Column(db.String(200))
+# Inisialisasi Flask
+app = Flask(__name__)
+# Konfigurasi database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/suppliers'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+db = SQLAlchemy()
+bcrypt = Bcrypt(app)
+
+# Tabel Produk (tb_product)
 class Product(db.Model):
+    __tablename__ = 'tb_product'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    id_barang = db.Column(db.String(50), unique=True, nullable=False)
+    nama_product = db.Column(db.String(100), nullable=False)
+    kategori = db.Column(db.String(50), nullable=False)
     stock = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    image_url = db.Column(db.String(200))
-    weight = db.Column(db.Float)
+    stok_minimum = db.Column(db.Integer, nullable=False)
+    stok_maksimum = db.Column(db.Integer, nullable=False)
+    harga = db.Column(db.Numeric(15, 2), nullable=False)
+    berat = db.Column(db.Numeric(10, 2), nullable=False)
+    size = db.Column(db.Numeric(5, 2), nullable=False)
+    width = db.Column(db.Numeric(5, 2), nullable=False)
+    genre = db.Column(db.String(50), nullable=False)
+    warna = db.Column(db.String(30), nullable=False)
+    deskripsi = db.Column(db.Text, nullable=False)
+    link_gambar_barang = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class Transaction(db.Model):
+# Tabel User (tb_user)
+class User(UserMixin, db.Model):
+    __tablename__ = 'tb_user'
     id = db.Column(db.Integer, primary_key=True)
-    tracking_number = db.Column(db.String(100))
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class TransactionItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
-    product_name = db.Column(db.String(100), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
+    def set_password(self, password):
+        """Hashes the password and stores it."""
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-class Order(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    retailer_id = db.Column(db.Integer, db.ForeignKey('retailer.id'), nullable=False)
-    supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'), nullable=False)
-    status = db.Column(db.String(50), default='Pending')
+    def check_password(self, password):
+        """Checks if the password matches the hashed password."""
+        return bcrypt.check_password_hash(self.password, password)
 
-class Shipment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
-    shipment_info = db.Column(db.String(200))
+# Tabel Supplier (tb_supplier)
+class Supplier(db.Model):
+    __tablename__ = 'tb_supplier'
+    id_supplier = db.Column(db.Integer, primary_key=True)
+    nama_supplier = db.Column(db.String(100), nullable=False)
+    contact = db.Column(db.String(50), nullable=False)
+    alamat_supplier = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-class Retailer(db.Model):
+# Tabel Relasi Supplier dan Produk (tb_supplier_product)
+class SupplierProduct(db.Model):
+    __tablename__ = 'tb_supplier_product'
+    id_supplier = db.Column(db.Integer, db.ForeignKey('tb_supplier.id_supplier'), primary_key=True)
+    id_product = db.Column(db.Integer, db.ForeignKey('tb_product.id'), primary_key=True)
+
+# Tabel Distributor (distributor)
+class Distributor(db.Model):
+    __tablename__ = 'distributor'
+    id_distributor = db.Column(db.Integer, primary_key=True)
+    nama_distributor = db.Column(db.String(100), nullable=False)
+    contact = db.Column(db.String(50), nullable=False)
+    alamat_distributor = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Tabel Retail (retail)
+class Retail(db.Model):
+    __tablename__ = 'retail'
+    id_retail = db.Column(db.Integer, primary_key=True)
+    nama_retail = db.Column(db.String(100), nullable=False)
+    contact = db.Column(db.String(50), nullable=False)
+    alamat_retail = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Tabel Transaksi (tb_transaksi)
+class Transaksi(db.Model):
+    __tablename__ = 'tb_transaksi'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    contact_info = db.Column(db.String(200))
+    resi = db.Column(db.String(50), nullable=False)
+    id_retail = db.Column(db.Integer, db.ForeignKey('retail.id_retail'), nullable=False)
+    jumlah_barang = db.Column(db.Integer, nullable=False)
+    total_harga = db.Column(db.Numeric(15, 2), nullable=False)
+    total_berat = db.Column(db.Numeric(10, 2), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Tabel Transaksi Barang (tb_transaksi_barang)
+class TransaksiBarang(db.Model):
+    __tablename__ = 'tb_transaksi_barang'
+    id = db.Column(db.Integer, primary_key=True)
+    id_transaksi = db.Column(db.Integer, db.ForeignKey('tb_transaksi.id'), nullable=False)
+    nama_barang = db.Column(db.String(100), nullable=False)
+    jumlah = db.Column(db.Integer, nullable=False)
+
+# Tabel Pembelian dari Supplier (tb_pembelian)
+class Pembelian(db.Model):
+    __tablename__ = 'tb_pembelian'
+    id = db.Column(db.Integer, primary_key=True)
+    id_supplier = db.Column(db.Integer, db.ForeignKey('tb_supplier.id_supplier'), nullable=False)
+    id_product = db.Column(db.Integer, db.ForeignKey('tb_product.id'), nullable=False)
+    jumlah = db.Column(db.Integer, nullable=False)
+    total_harga = db.Column(db.Numeric(15, 2), nullable=False)
+    tanggal_pembelian = db.Column(db.Date, nullable=False)
+
+# Tabel Distribusi (distribusi)
+class Distribusi(db.Model):
+    __tablename__ = 'distribusi'
+    id_distribusi = db.Column(db.Integer, primary_key=True)
+    id_distributor = db.Column(db.Integer, db.ForeignKey('distributor.id_distributor'), nullable=False)
+    id_retail = db.Column(db.Integer, db.ForeignKey('retail.id_retail'), nullable=False)
+    id_product = db.Column(db.Integer, db.ForeignKey('tb_product.id'), nullable=False)
+    jumlah = db.Column(db.Integer, nullable=False)
+    tanggal_distribusi = db.Column(db.Date, nullable=False)
+
+# Tabel Pengiriman dari Distributor ke Retail (pengiriman_distributor)
+class PengirimanDistributor(db.Model):
+    __tablename__ = 'pengiriman_distributor'
+    id_pengiriman = db.Column(db.String(50), primary_key=True)
+    id_distributor = db.Column(db.Integer, db.ForeignKey('distributor.id_distributor'), nullable=False)
+    id_product = db.Column(db.Integer, db.ForeignKey('tb_product.id'), nullable=False)
+    jumlah = db.Column(db.Integer, nullable=False)
+    tanggal_pengiriman = db.Column(db.Date, nullable=False)
+    total_berat = db.Column(db.Numeric(10, 2), nullable=False)
+    total_harga = db.Column(db.Numeric(15, 2), nullable=False)
+    status = db.Column(db.String(50), nullable=False)
+    distributor = db.Column(db.String(100), nullable=False)

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pengiriman</title>
+    <link rel="stylesheet" href="./static/styles.css">    
+</head>
+<body>
+    <div class="container">
+        <h2>Kelola Pengiriman</h2>
+
+        <!-- Tombol Tambah Pengiriman -->
+        <div class="add-button-container">
+            <a href="/add_shipping" class="crud-btn">Tambah Pengiriman</a>
+        </div>
+
+        <!-- Tabel Pengiriman -->
+        <table id="kelolaPengiriman">
+            <thead>
+                <tr>
+                    <th>ID Pengiriman</th>
+                    <th>ID Distributor</th>
+                    <th>ID Produk</th>
+                    <th>Jumlah</th>
+                    <th>Tanggal Pengiriman</th>
+                    <th>Distributor</th>
+                    <th>Total Berat (kg)</th>
+                    <th>Total Harga (Rp)</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shipping in shipping_list %}
+                <tr>
+                    <td>{{ shipping.id_pengiriman }}</td>
+                    <td>{{ shipping.id_distributor }}</td>
+                    <td>{{ shipping.id_product }}</td>
+                    <td>{{ shipping.jumlah }}</td>
+                    <td>{{ shipping.tanggal_pengiriman.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ shipping.distributor }}</td>
+                    <td>{{ shipping.total_berat }}</td>
+                    <td>{{ shipping.total_harga }}</td>
+                    <td>{{ shipping.status }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/edit_shipping/{{ shipping.id_pengiriman }}" class="crud-btn">Edit</a>
+                            <form action="/delete_shipping/{{ shipping.id_pengiriman }}" method="POST" style="display:inline;">
+                                <button type="submit" class="crud-btn">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Transaksi</title>
+    <link rel="stylesheet" href="./static/styles.css">    
+</head>
+<body>
+    <div class="container">
+        <h2>Kelola Transaksi</h2>
+
+        <!-- Tombol Tambah Transaksi -->
+        <div class="add-button-container">
+            <a href="{{ url_for('add_transaksi') }}" class="crud-btn">Tambah Transaksi</a>
+        </div>
+
+        <!-- Tabel Transaksi -->
+        <table id="kelolaTransaksi">
+            <thead>
+                <tr>
+                    <th>ID Transaksi</th>
+                    <th>ID Retail</th>
+                    <th>Jumlah Barang</th>
+                    <th>Total Harga (Rp)</th>
+                    <th>Total Berat (kg)</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Looping data transaksi dari backend -->
+                {% for transaksi in transaksi_list %}
+                <tr>
+                    <td>{{ transaksi.id }}</td>
+                    <td>{{ transaksi.id_retail }}</td>
+                    <td>{{ transaksi.jumlah_barang }}</td>
+                    <td>{{ transaksi.total_harga }}</td>
+                    <td>{{ transaksi.total_berat }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{ url_for('edit_transaksi', id=transaksi.id) }}" class="crud-btn">Edit</a>
+                            <form action="{{ url_for('delete_transaksi', id=transaksi.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="crud-btn">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

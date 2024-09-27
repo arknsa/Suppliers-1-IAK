@@ -56,24 +56,42 @@ def logout():
 def dashboard():
     return f'Hello, {current_user.username}! Selamat datang di dashboard.'
 
-# Suppliers
-@app.route('/suppliers')
+# Suppliers - Mengembalikan semua data supplier dalam format JSON
+@app.route('/suppliers', methods=['GET'])
 def suppliers():
     suppliers_info = Supplier.query.all()  # Ambil semua supplier dari database
-    return render_template('suppliers.html', suppliers=suppliers_info)
+    suppliers_list = [{
+        "id_supplier": supplier.id_supplier,
+        "nama_supplier": supplier.nama_supplier,
+        "contact": supplier.contact,
+        "alamat_supplier": supplier.alamat_supplier,
+        "created_at": supplier.created_at.strftime('%Y-%m-%d %H:%M:%S')
+    } for supplier in suppliers_info]
 
-# Products
-@app.route('/products')
+    return jsonify(suppliers_list)
+
+# Products - Mengembalikan semua produk dalam format JSON
+@app.route('/products', methods=['GET'])
 def products():
     all_product = Product.query.all()  # Ambil semua produk dari database
-    return render_template('products.html', products=all_product)
+    products_list = [{
+        "id_barang": product.id_barang,
+        "nama_product": product.nama_product,
+        "kategori": product.kategori,
+        "stock": product.stock,
+        "harga": product.harga,
+        "berat": product.berat,
+        "size": product.size,
+        "width": product.width,
+        "genre": product.genre,
+        "warna": product.warna,
+        "deskripsi": product.deskripsi,
+        "link_gambar_barang": product.link_gambar_barang,
+        "created_at": product.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        "updated_at": product.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+    } for product in all_product]
 
-# Orders
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from datetime import datetime
-from models import db, Transaksi, TransaksiBarang
-
-app = Flask(__name__)
+    return jsonify(products_list)
 
 # Fungsi menghitung total harga
 def calculate_total_price(list_barang):
@@ -85,32 +103,30 @@ def calculate_total_weight(list_barang):
     # Contoh sederhana: berat tiap barang adalah 1 kg
     return len(list_barang.split(',')) * 1
 
-@app.route('/orders', methods=['GET', 'POST'])
+@app.route('/orders', methods=['POST'])
 def orders():
-    if request.method == 'POST':
-        list_barang = request.form.get('list_barang')  # Daftar barang yang dibeli
-        alamat_pembeli = request.form.get('alamat_pembeli')  # Alamat pembeli
-        kode_jasa = request.form.get('kode_jasa')  # Kode jasa pengiriman
+    # Ambil data dari request JSON
+    data = request.get_json()
+    list_barang = data.get('list_barang')
 
-        # Logika untuk membuat resi (nomor pengiriman unik)
-        resi = f"RESI-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+    # Periksa apakah list_barang ada dan valid
+    if not list_barang:
+        return jsonify({"error": "List barang tidak boleh kosong"}), 400
 
-        # Simpan transaksi baru di database
-        new_transaksi = Transaksi(
-            resi=resi,
-            id_retail=None,  # Harus disesuaikan dengan data retail atau pembeli
-            jumlah_barang=len(list_barang.split(',')),  # Hitung jumlah barang dari list
-            total_harga=calculate_total_price(list_barang),  # Gunakan fungsi untuk menghitung total harga
-            total_berat=calculate_total_weight(list_barang),  # Gunakan fungsi untuk menghitung total berat
-            created_at=datetime.utcnow()
-        )
-        db.session.add(new_transaksi)
-        db.session.commit()
+    # Lanjutkan perhitungan jika valid
+    total_harga = calculate_total_price(list_barang)
+    total_berat = calculate_total_weight(list_barang)
 
-        # Setelah pesanan berhasil, tampilkan halaman sukses dengan nomor resi
-        return render_template('order_success.html', resi=resi)
+    # Buat nomor resi (misalnya)
+    resi = f"RESI-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
 
-    return render_template('orders.html')
+    # Simpan transaksi atau lakukan sesuatu dengan total_harga dan total_berat
+    return jsonify({
+        "resi": resi,
+        "message": "Pesanan berhasil dibuat",
+        "total_harga": total_harga,
+        "total_berat": total_berat
+    }), 200
 
 
 # Route untuk menampilkan halaman Manage Product
